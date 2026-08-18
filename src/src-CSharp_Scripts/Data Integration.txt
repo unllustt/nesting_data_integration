@@ -1,0 +1,94 @@
+// Grasshopper Script Instance
+#region Usings
+using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+
+using Rhino;
+using Rhino.Geometry;
+
+using Grasshopper;
+using Grasshopper.Kernel;
+using Grasshopper.Kernel.Data;
+using Grasshopper.Kernel.Types;
+#endregion
+
+public class Script_Instance : GH_ScriptInstance
+{
+    #region Notes
+    /* 
+      Members:
+        RhinoDoc RhinoDocument
+        GH_Document GrasshopperDocument
+        IGH_Component Component
+        int Iteration
+
+      Methods (Virtual & overridable):
+        Print(string text)
+        Print(string format, params object[] args)
+        Reflect(object obj)
+        Reflect(object obj, string method_name)
+    */
+    #endregion
+
+    private void RunScript(
+		DataTree<string> excelData,
+		ref object W,
+		ref object L,
+		ref object R,
+		ref object W2,
+		ref object L2,
+		ref object R2)
+    {
+        List<double> Widths_Sofa   = new List<double>();
+        List<double> Lengths_Sofa  = new List<double>();
+        List<double> Radiuses_Sofa = new List<double>();
+
+        List<double> Widths_Table   = new List<double>();
+        List<double> Lengths_Table  = new List<double>();
+        List<double> Radiuses_Table = new List<double>();
+
+
+        if (excelData == null || excelData.BranchCount == 0) return;
+
+        int rowCount = excelData.Branch(0).Count;
+
+        for (int i = 0; i < rowCount; i++)
+        {
+
+            bool w_ok = double.TryParse(excelData.Branch(0)[i], out double w);
+            bool l_ok = double.TryParse(excelData.Branch(1)[i], out double l);
+            bool m_ok = int.TryParse(excelData.Branch(2)[i], out int m);
+            bool r_ok = double.TryParse(excelData.Branch(3)[i], out double r);
+            bool c_ok = int.TryParse(excelData.Branch(4)[i], out int c);
+
+
+            if (!w_ok || !l_ok || !m_ok || !r_ok || !c_ok) continue;
+
+            for (int j = 0; j < c; j++)
+            {
+                if (m == 1)
+                {
+                    Widths_Sofa.Add(w);
+                    Lengths_Sofa.Add(l);
+                    Radiuses_Sofa.Add(r);
+                }
+                else if (m == 2)
+                {
+                    Widths_Table.Add(w);
+                    Lengths_Table.Add(l);
+                    Radiuses_Table.Add(r);
+                }
+            }
+        }
+
+        W  = Widths_Sofa;
+        L  = Lengths_Sofa;
+        R  = Radiuses_Sofa;
+        W2 = Widths_Table;
+        L2 = Lengths_Table;
+        R2 = Radiuses_Table;
+    }
+}
